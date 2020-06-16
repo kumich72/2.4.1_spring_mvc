@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 public class UserDetailServiceImp implements UserDetailsService {
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
@@ -23,11 +23,11 @@ public class UserDetailServiceImp implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
         List<Role> roles = userService.getRolesByUser(user);
-//        UserDetails userDetails =
-//                new org.springframework.security.core.userdetails.User(userName,
-//                        user.getPassword(),
-//                        roles);
+        UserDetails userDetails =
+                new org.springframework.security.core.userdetails.User(userName,
+                        user.getPassword(),
+                        roles);
 
-        return user;
+        return userDetails;
     }
 }

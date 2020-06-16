@@ -154,6 +154,15 @@ public class User implements UserDetails {
         return Objects.hash(getName(), getId());
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 //    public boolean isAdmin() {
 //        return this.role.contains("admin");
 //    }

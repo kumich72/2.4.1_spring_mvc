@@ -22,6 +22,17 @@ public class UserController {
     @Autowired
     private UserService  userService;
 
+//    @RequestMapping(value = "user", method = RequestMethod.GET)
+//    @ResponseBody
+//    public ModelAndView printCurrentUser() {
+//        UserService userService = new UserService();
+//
+//        List<User> users = userService.getUserById();
+//        ModelAndView result = new ModelAndView("user");
+//        result.addObject("user", users);
+//        return result;
+//    }
+
     @RequestMapping(value = "users", method = RequestMethod.GET)
     @ResponseBody
     public ModelAndView printUsers() {
@@ -105,11 +116,11 @@ public class UserController {
         return "login";
     }
 
-    @RequestMapping(value = "login", method = RequestMethod.POST)
-    public ModelAndView loginUser(@RequestParam String j_username, String j_password) {
-        ModelAndView result = new ModelAndView("/user");
-        User user = userService.findByUsername(j_username);
-        result.addObject("user", user);
-        return result;
-    }
+//    @RequestMapping(value = "login", method = RequestMethod.POST)
+//    public ModelAndView loginUser(@RequestParam String j_username, String j_password) {
+//        ModelAndView result = new ModelAndView("/user");
+//        User user = userService.findByUsername(j_username);
+//        result.addObject("user", user);
+//        return result;
+//    }
 }

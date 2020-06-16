@@ -28,7 +28,7 @@
             <td>${user.name}</td>
             <td>${user.email}</td>
             <td>${user.password}</td>
-            <td>${user.role}</td>
+<%--            <td>${user.role}</td>--%>
             <td><form action="delete" method="POST">
                 <button type="submit">Delete</button>
                 <input type="hidden" id="id" name="id" value="${user.id}">
@@ -40,5 +40,6 @@
         </tr>
     </c:forEach>
 </table>
+<a href="<c:url value="/logout" />">Logout</a>
 </body>
 </html>

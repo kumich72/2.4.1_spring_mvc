@@ -23,7 +23,9 @@ public class Role implements GrantedAuthority {
 //    @JoinColumn(name="role_id", nullable=false)
 //    private User user;
 
+    public Role() {
 
+    }
 
     public Role(long id, String name, User user) {
         this.id = id;
@@ -59,18 +61,13 @@ public class Role implements GrantedAuthority {
     public String getAuthority() {
         return getName();
     }
-}
 
-//@Entity
-//@Table(name="ITEMS")
-//public class Items {
-//
-//    //...
-//    @ManyToOne
-//    @JoinColumn(name="cart_id", nullable=false)
-//    private Cart cart;
-//
-//    public Items() {}
-//
-//    // getters and setters
-//}
+    @Override
+    public String toString() {
+        return "Role{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", user=" + user +
+                '}';
+    }
+}
