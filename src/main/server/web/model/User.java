@@ -163,7 +163,4 @@ public class User implements UserDetails {
                 ", email='" + email + '\'' +
                 '}';
     }
-//    public boolean isAdmin() {
-//        return this.role.contains("admin");
-//    }
 }
