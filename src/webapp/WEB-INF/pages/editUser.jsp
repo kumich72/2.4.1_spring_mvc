@@ -33,5 +33,6 @@
     <input type="hidden" id="id" name ="id" value="${user.id}">
     <button type="submit">Save user</button>
 </form>
+<a href="<c:url value="/logout" />">Logout</a>
 </body>
 </html>

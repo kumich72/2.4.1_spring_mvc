@@ -2,16 +2,18 @@ package web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import web.exception.DBException;
 import web.model.Role;
 import web.model.User;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import web.model.UserRole;
 import web.service.UserService;
+
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,24 +24,34 @@ public class UserController {
     @Autowired
     private UserService  userService;
 
-//    @RequestMapping(value = "user", method = RequestMethod.GET)
-//    @ResponseBody
-//    public ModelAndView printCurrentUser() {
-//        UserService userService = new UserService();
-//
-//        List<User> users = userService.getUserById();
-//        ModelAndView result = new ModelAndView("user");
-//        result.addObject("user", users);
-//        return result;
-//    }
+    @RequestMapping(value = "user", method = RequestMethod.GET)
+    @ResponseBody
+    public ModelAndView printCurrentUser() {
+        ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpSession session = attr.getRequest().getSession();
+        String j_username = (String) session.getAttribute("j_username");
+        String j_password = (String) session.getAttribute("j_password");
+        User user = userService.getUserByNameAndPassword(j_username,  j_password);
+        List<Role> roles = userService.getRolesByUser(user);
+//        User user = (User) session.getAttribute("user");
+//        String name = session.getParameter("name");
+//        String password = session.getParameter("password");
+
+        ModelAndView result = new ModelAndView("user");
+        result.addObject(roles);
+        result.addObject(user);
+
+//        model.addAttribute("roles",roles);
+        return result;
+    }
 
     @RequestMapping(value = "users", method = RequestMethod.GET)
     @ResponseBody
     public ModelAndView printUsers() {
 //        UserService userService = new UserService();
-        List<User> users = userService.getAllUsers();
+        List<UserRole> userRoles = userService.getAllUsersAndRoles();
         ModelAndView result = new ModelAndView("users");
-        result.addObject("users", users);
+        result.addObject("userRoles", userRoles);
         return result;
     }
 

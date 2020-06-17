@@ -2,6 +2,7 @@ package web.service;
 
 import web.model.Role;
 import web.model.User;
+import web.model.UserRole;
 
 import java.util.List;
 
@@ -11,4 +12,8 @@ public interface IUserService {
     User findByUsername(String name);
 
     List<Role> getRolesByUser(User user);
+
+    boolean userIsAdmin(User user);
+
+    List<UserRole> getAllUsersAndRoles();
 }

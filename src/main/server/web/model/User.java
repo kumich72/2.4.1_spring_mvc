@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import web.service.UserService;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -80,7 +81,7 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         //return getRoles();
-        return  userService.getRolesByUser(this);
+        return  userService.getInstance().getRolesByUser(this);
     }
 
     public String getPassword() {
@@ -133,10 +134,14 @@ public class User implements UserDetails {
     }
 
 
-//    public List<Role> getRole() { return role; }
+    public List<Role> getRole() {
+        List<Role> roles = new ArrayList<Role>();
+        roles = userService.getInstance().getRolesByUser(this);
+        return roles;
+    }
 
-//    public void setRole(String role) {
-//        this.role = role;
+//    public void setRole(List<Role> roles) {
+//        this.roles = roles;
 //    }
 
     @Override
@@ -162,5 +167,9 @@ public class User implements UserDetails {
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
                 '}';
+    }
+
+    public boolean isAdmin() {
+           return userService.getInstance().userIsAdmin(this);
     }
 }

@@ -8,6 +8,7 @@ import web.DAO.UserHibernateDAO;
 import web.exception.DBException;
 import web.model.Role;
 import web.model.User;
+import web.model.UserRole;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,20 @@ public class UserService implements IUserService {
         return null;
     }
 
+    @Override
+    public boolean userIsAdmin(User user) {
+        try {
+            List<Role> roles = userHibernateDAO.getRolesByUser(user);
+            boolean isHaveAdmin = roles.stream().anyMatch(e -> e.getName().equals("ADMIN"));
+            return isHaveAdmin;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+
     public User getUserById(Long id) {
         try {
             User user = userHibernateDAO.getUserById(id);
@@ -59,16 +74,32 @@ public class UserService implements IUserService {
     }
 
     public List<User> getAllUsers() {
-//        IUserDAO userDAO = userHibernateDAO;
-
         List<User> users = new ArrayList<>();
         try {
             users = userHibernateDAO.getAllUsers();
-//            users = userDAO.getAllUsers();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return users;
+    }
+
+    @Override
+    public List<UserRole> getAllUsersAndRoles() {
+        List<User> users = new ArrayList<>();
+        List<UserRole> userRoles = new ArrayList<>();
+        try {
+            users = userHibernateDAO.getAllUsers();
+            for(User user : users) {
+                List<Role> roles = getRolesByUser(user);
+                UserRole userRole = new UserRole(user, roles);
+                userRoles.add(userRole);
+//                user.setRole(roles);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return userRoles;
     }
 
     public boolean deleteUser(Long id) throws DBException {

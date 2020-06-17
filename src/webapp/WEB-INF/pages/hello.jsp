@@ -4,6 +4,6 @@
 <c:forEach var="msq" items="${messages}">
     <h1>${msq}</h1>
 </c:forEach>
-
+<a href="<c:url value="/logout" />">Logout</a>
 </body>
 </html>

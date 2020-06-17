@@ -34,5 +34,6 @@
     </table>
     <button type="submit">Create user</button>
 </form>
+<a href="<c:url value="/logout" />">Logout</a>
 </body>
 </html>
