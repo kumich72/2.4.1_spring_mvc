@@ -13,6 +13,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class UserHibernateDAO implements IUserDAO {
     private Configuration configuration;
 
     @Autowired
-    public UserHibernateDAO () {
+    public UserHibernateDAO() {
         if (configuration == null) {
             ApplicationContext ctx = new AnnotationConfigApplicationContext(HibernateConfig.class);
             configuration = (Configuration) ctx.getBean("getConfiguration");
@@ -180,7 +181,7 @@ public class UserHibernateDAO implements IUserDAO {
 
 
     @Override
-    public User getUserById(Long id)  {
+    public User getUserById(Long id) {
         Session session = sessionFactory.openSession();
         try {
             User user = (User) session.load(User.class, id);
@@ -210,7 +211,7 @@ public class UserHibernateDAO implements IUserDAO {
     }
 
     @Override
-    public boolean addUser(User user)  {
+    public boolean addUser(User user) {
         try {
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
@@ -237,6 +238,43 @@ public class UserHibernateDAO implements IUserDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
+    }
+
+    public List<Role> getAllRoles() {
+        List<Role> users = new ArrayList<>();
+        Session session = sessionFactory.openSession();
+        try {
+            Transaction transaction = session.beginTransaction();
+            users = session.createQuery("FROM Role AS r group by r.name").list();
+            transaction.commit();
+            return users;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        session.close();
+        return null;
+    }
+
+    @Transactional
+    public boolean addRolesUser(User user, String[] roles) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+            session.save(user);
+            for (String name : roles) {
+                Role role = new Role();
+                role.setName(name);
+                role.setUser(user);
+                session.save(role);
+            }
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
+        }
+        session.close();
         return false;
     }
 }

@@ -15,14 +15,17 @@ import web.service.UserService;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Controller
 @RequestMapping("/")
-public class UserController {
-    @Autowired
-    private UserService  userService;
+public class UserController{
+
+    private final UserService  userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @RequestMapping(value = "user", method = RequestMethod.GET)
     @ResponseBody
@@ -50,7 +53,7 @@ public class UserController {
     public ModelAndView printUsers() {
 //        UserService userService = new UserService();
         List<UserRole> userRoles = userService.getAllUsersAndRoles();
-        ModelAndView result = new ModelAndView("users");
+        ModelAndView result = new ModelAndView("admin/users");
         result.addObject("userRoles", userRoles);
         return result;
     }
@@ -64,7 +67,7 @@ public class UserController {
 
         }
         List<User> users = userService.getAllUsers();
-        ModelAndView result = new ModelAndView("/users");
+        ModelAndView result = new ModelAndView("admin/users");
         result.addObject("users", users);
         return result;
     }
@@ -73,7 +76,7 @@ public class UserController {
     @ResponseBody
     public ModelAndView editingUser(@RequestParam String edit_id) {
         User user = userService.getUserById(Long.valueOf(edit_id));
-        ModelAndView result = new ModelAndView("/editUser");
+        ModelAndView result = new ModelAndView("admin/editUser");
         result.addObject("user", user);
         return result;
     }
@@ -81,13 +84,14 @@ public class UserController {
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     @ResponseBody
     public ModelAndView editUser(@RequestParam String id, String name, String password, String email) {
+        ModelAndView result = new ModelAndView("admin/users");
         try {
             userService.editUser(Long.valueOf(id), name, password, email );
         }catch (DBException e){
-
+            result.addObject("error", e.getLocalizedMessage());
         }
         List<User> users = userService.getAllUsers();
-        ModelAndView result = new ModelAndView("/users");
+
         result.addObject("users", users);
         return result;
     }
@@ -95,12 +99,12 @@ public class UserController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @ResponseBody
     public ModelAndView addUser(@RequestParam String name, String password, String email, String[] roles) {
-        ModelAndView result = new ModelAndView("/users");
+        ModelAndView result = new ModelAndView("admin/users");
         try {
             User user = new User(name,password, email);
-            userService.addUser(user);
-        }catch (DBException e){
-
+            userService.addRolesUser(user,roles);
+        }catch (Exception e){
+            result.addObject("error", e.getLocalizedMessage());
         }
         List<User> users = userService.getAllUsers();
 
@@ -110,7 +114,12 @@ public class UserController {
 
     @RequestMapping(value = "addUser", method = RequestMethod.GET)
     public String printAdd(ModelMap model) {
-        return "addUser";
+//        ModelAndView result = new ModelAndView("admin/users");
+
+        List<Role> roles = userService.getAllRoles();
+
+        model.addAttribute("roles", roles);
+        return "admin/addUser";
     }
 
     @RequestMapping(value = "hello", method = RequestMethod.GET)

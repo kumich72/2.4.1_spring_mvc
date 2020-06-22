@@ -102,6 +102,31 @@ public class UserService implements IUserService {
         return userRoles;
     }
 
+    @Override
+    public List<Role> getAllRoles() {
+        List<Role> roleArrayList = new ArrayList<>();
+        try {
+            roleArrayList = userHibernateDAO.getAllRoles();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return roleArrayList;
+    }
+
+    @Override
+    public boolean addRolesUser(User user, String[] roles) {
+        try {
+            if (userHibernateDAO.addRolesUser(user, roles)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public boolean deleteUser(Long id) throws DBException {
         try {
             if (userHibernateDAO.deleteUser(id)) {

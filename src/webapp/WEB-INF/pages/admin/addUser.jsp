@@ -7,6 +7,7 @@
 </head>
 <body>
 <h3>Add new user</h3>
+<%--${pageContext}--%>
 <form action="add" method="POST">
     <table border="1" cellspacing="0" cellpadding="2">
         <tr>
@@ -25,10 +26,9 @@
         <tr>
             <td>Role</td>
             <td>
-                <select name="role">
-                <option selected value="user">user</option>
-                <option value="admin">admin</option>
-                </select>
+                <c:forEach var="role" items="${roles}">
+                    <label class="checkbox"><input type="checkbox"  value="${role.name}" name="roles">${role.name}</label>
+                </c:forEach>
             </td>
         </tr>
     </table>

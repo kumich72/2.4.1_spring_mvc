@@ -23,6 +23,10 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Autowired
     private UserService userService;
 
+//    public LoginSuccessHandler(UserService userService) {
+//        this.userService = userService;
+//    }
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest,
                                         HttpServletResponse httpServletResponse,
@@ -46,7 +50,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             session.setAttribute("j_password", j_password);
 
             httpServletResponse.sendRedirect("/user");
-
         }
     }
 }

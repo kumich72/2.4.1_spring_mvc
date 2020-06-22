@@ -16,4 +16,8 @@ public interface IUserService {
     boolean userIsAdmin(User user);
 
     List<UserRole> getAllUsersAndRoles();
+
+    List<Role> getAllRoles();
+
+    boolean addRolesUser(User user, String[] roles);
 }
