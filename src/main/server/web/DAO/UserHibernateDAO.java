@@ -69,7 +69,8 @@ public class UserHibernateDAO implements IUserDAO {
         return false;
     }
 
-    public boolean editUser(Long id, String name, String email, String password) {
+    @Transactional
+    public boolean editUser(Long id, String name, String email, String password, String[] roles) {
         try {
             Session session = sessionFactory.openSession();
             User user = (User) session.load(User.class, id);
@@ -78,6 +79,15 @@ public class UserHibernateDAO implements IUserDAO {
                 user.setEmail(email);
                 user.setPassword(password);
                 session.save(user);
+
+                if(deleteAllRolesUser(user)) {
+                    for (String nameRole : roles) {
+                        Role role = new Role();
+                        role.setName(nameRole);
+                        role.setUser(user);
+                        session.save(role);
+                    }
+                }
                 transaction.commit();
                 session.close();
                 return true;
@@ -88,20 +98,46 @@ public class UserHibernateDAO implements IUserDAO {
         return false;
     }
 
-    public boolean deleteUser(Long id) {
+    private boolean deleteAllRolesUser(User user) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
         try {
-            Session session = sessionFactory.openSession();
+            List <Role > roles =  getRolesByUser(user);
+            for(Role role: roles)
+            {
+                session.delete(role);
+            }
+            transaction.commit();
+            return true;
+        }
+        catch (Exception e){
+            transaction.rollback();
+        }
+        return false;
+    }
+
+
+    @Transactional
+    public boolean deleteUser(Long id) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+
             User user = (User) session.load(User.class, id);
             if (user != null) {
-                Transaction transaction = session.beginTransaction();
+                List<Role> roles = getRolesByUser(user);
+                for(Role role: roles){
+                    session.delete(role);
+                }
                 session.delete(user);
                 transaction.commit();
-                session.close();
                 return true;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            transaction.rollback();
         }
+        session.close();
         return false;
     }
 

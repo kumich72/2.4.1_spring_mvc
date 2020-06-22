@@ -69,6 +69,7 @@ public class UserController{
         List<User> users = userService.getAllUsers();
         ModelAndView result = new ModelAndView("admin/users");
         result.addObject("users", users);
+
         return result;
     }
 
@@ -76,17 +77,22 @@ public class UserController{
     @ResponseBody
     public ModelAndView editingUser(@RequestParam String edit_id) {
         User user = userService.getUserById(Long.valueOf(edit_id));
+
+        List<Role> roles = userService.getAllRoles();
+        List<Role> rolesUser = userService.getRolesByUser(user);
         ModelAndView result = new ModelAndView("admin/editUser");
         result.addObject("user", user);
+        result.addObject("roles", roles);
+        result.addObject("rolesUser", rolesUser);
         return result;
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     @ResponseBody
-    public ModelAndView editUser(@RequestParam String id, String name, String password, String email) {
+    public ModelAndView editUser(@RequestParam String id, String name, String password, String email, String[] roles) {
         ModelAndView result = new ModelAndView("admin/users");
         try {
-            userService.editUser(Long.valueOf(id), name, password, email );
+            userService.editUser(Long.valueOf(id), name, password, email, roles );
         }catch (DBException e){
             result.addObject("error", e.getLocalizedMessage());
         }

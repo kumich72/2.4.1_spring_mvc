@@ -12,7 +12,7 @@ public interface IUserDAO {
 
     boolean addUser(User user);
 
-    boolean editUser(Long id, String name, String password, String email);
+    boolean editUser(Long id, String name, String password, String email, String[] roles);
 
     boolean deleteUser(Long id);
 

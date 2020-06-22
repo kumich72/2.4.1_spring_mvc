@@ -150,9 +150,9 @@ public class UserService implements IUserService {
         }
     }
 
-    public boolean editUser(Long id, String name, String password, String email) throws DBException {
+    public boolean editUser(Long id, String name, String password, String email, String[] roles) throws DBException {
         try {
-            if (userHibernateDAO.editUser(id, name, password, email)) {
+            if (userHibernateDAO.editUser(id, name, password, email, roles)) {
                 return true;
             } else {
                 return false;

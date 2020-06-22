@@ -19,18 +19,26 @@
         </tr>
         <tr>
             <td>Email</td>
-            <td><input type="text" id="email" name="email" value="${user.email}" /></td>
+            <td><input type="text" id="email" name="email" value="${user.email}"/></td>
         </tr>
         <tr>
             <td>Password</td>
-            <td><input type="text" id="password" name="password" value="${user.password}" /></td>
+            <td><input type="text" id="password" name="password" value="${user.password}"/></td>
         </tr>
         <tr>
             <td>Role</td>
-            <td>${user.role}</td>
+            <td><c:forEach var="role" items="${roles}">
+                <c:forEach var="roleUser" items="${rolesUser}">
+                    <label class="checkbox">
+                        <input type="checkbox" value="${role.name}" name="roles"
+                               <c:if test="${role.name==roleUser.name}">checked="checked"</c:if>
+                        >${role.name}</label>
+                </c:forEach>
+            </c:forEach>
+            </td>
         </tr>
     </table>
-    <input type="hidden" id="id" name ="id" value="${user.id}">
+    <input type="hidden" id="id" name="id" value="${user.id}">
     <button type="submit">Save user</button>
 </form>
 <a href="<c:url value="/logout" />">Logout</a>
