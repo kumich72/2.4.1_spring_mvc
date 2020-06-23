@@ -5,6 +5,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 import web.exception.DBException;
 import web.model.Role;
 import web.model.User;
@@ -60,17 +61,13 @@ public class UserController{
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @ResponseBody
-    public ModelAndView deleteUser(@RequestParam String id) {
+    public RedirectView deleteUser(@RequestParam String id) {
         try {
             userService.deleteUser(Long.valueOf(id));
         }catch (DBException e){
 
         }
-        List<User> users = userService.getAllUsers();
-        ModelAndView result = new ModelAndView("admin/users");
-        result.addObject("users", users);
-
-        return result;
+        return  new RedirectView ("users");
     }
 
     @RequestMapping(value = "/editing", method = RequestMethod.POST)
@@ -89,22 +86,19 @@ public class UserController{
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     @ResponseBody
-    public ModelAndView editUser(@RequestParam String id, String name, String password, String email, String[] roles) {
+    public RedirectView editUser(@RequestParam String id, String name, String password, String email, String[] roles) {
         ModelAndView result = new ModelAndView("admin/users");
         try {
             userService.editUser(Long.valueOf(id), name, password, email, roles );
         }catch (DBException e){
             result.addObject("error", e.getLocalizedMessage());
         }
-        List<User> users = userService.getAllUsers();
-
-        result.addObject("users", users);
-        return result;
+        return  new RedirectView ("users");
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @ResponseBody
-    public ModelAndView addUser(@RequestParam String name, String password, String email, String[] roles) {
+    public RedirectView addUser(@RequestParam String name, String password, String email, String[] roles) {
         ModelAndView result = new ModelAndView("admin/users");
         try {
             User user = new User(name,password, email);
@@ -115,13 +109,13 @@ public class UserController{
         List<User> users = userService.getAllUsers();
 
         result.addObject("users", users);
-        return result;
+        return  new RedirectView ("users");
+//        return result;
     }
 
     @RequestMapping(value = "addUser", method = RequestMethod.GET)
     public String printAdd(ModelMap model) {
 //        ModelAndView result = new ModelAndView("admin/users");
-
         List<Role> roles = userService.getAllRoles();
 
         model.addAttribute("roles", roles);
@@ -142,12 +136,4 @@ public class UserController{
     public String loginPage() {
         return "login";
     }
-
-//    @RequestMapping(value = "login", method = RequestMethod.POST)
-//    public ModelAndView loginUser(@RequestParam String j_username, String j_password) {
-//        ModelAndView result = new ModelAndView("/user");
-//        User user = userService.findByUsername(j_username);
-//        result.addObject("user", user);
-//        return result;
-//    }
 }
