@@ -36,20 +36,21 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         boolean isHaveAdmin = roles.stream().anyMatch(e -> e.getName().equals("ADMIN"));
         if(isHaveAdmin){
             httpServletResponse.sendRedirect("/users");
-        }
-        boolean isHaveUser = roles.stream().anyMatch(e -> e.getName().equals("USER"));
-        if(isHaveUser) {
-            String j_username = httpServletRequest.getParameter("j_username");
-            String j_password = httpServletRequest.getParameter("j_password");
+        }else{
+            boolean isHaveUser = roles.stream().anyMatch(e -> e.getName().equals("USER"));
+            if(isHaveUser) {
+                String j_username = httpServletRequest.getParameter("j_username");
+                String j_password = httpServletRequest.getParameter("j_password");
 
-            HttpSession session = httpServletRequest.getSession();
-            User user = (User) session.getAttribute("user");
+                HttpSession session = httpServletRequest.getSession();
+                User user = (User) session.getAttribute("user");
 
-            session.setAttribute("user", user);
-            session.setAttribute("j_username", j_username);
-            session.setAttribute("j_password", j_password);
+                session.setAttribute("user", user);
+                session.setAttribute("j_username", j_username);
+                session.setAttribute("j_password", j_password);
 
-            httpServletResponse.sendRedirect("/user");
+                httpServletResponse.sendRedirect("/user");
+            }
         }
     }
 }

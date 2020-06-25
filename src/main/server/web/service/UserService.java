@@ -136,13 +136,13 @@ public class UserService implements IUserService {
         List<String> allNamesRoles = getAllRolesNames();
 
         for (String role : allNamesRoles) {
-            for (String roleUser : rolesUser) {
-                if (allNamesRoles.contains(roleUser)) {
+//            for (String roleUser : rolesUser) {
+                if (rolesUser.contains(role)) {
                     result1.put(role, true);
                 } else {
                     result1.put(role, false);
                 }
-            }
+//            }
         }
         return result1;
     }
