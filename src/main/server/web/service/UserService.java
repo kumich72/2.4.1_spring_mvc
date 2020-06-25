@@ -130,21 +130,18 @@ public class UserService implements IUserService {
 
     @Override
     public Map<String, Boolean> getRoleCheckedByUser(User user) {
-        List<RoleChecked> result = new ArrayList<>();
-        Map<String, Boolean> result1 = new HashMap<String, Boolean>();
+        Map<String, Boolean> result = new HashMap<String, Boolean>();
         List<String> rolesUser = getRolesNamesByUser(user);
         List<String> allNamesRoles = getAllRolesNames();
 
         for (String role : allNamesRoles) {
-//            for (String roleUser : rolesUser) {
-                if (rolesUser.contains(role)) {
-                    result1.put(role, true);
-                } else {
-                    result1.put(role, false);
-                }
-//            }
+            if (rolesUser.contains(role)) {
+                result.put(role, true);
+            } else {
+                result.put(role, false);
+            }
         }
-        return result1;
+        return result;
     }
 
     private List<String> getRolesNamesByUser(User user) {

@@ -1,22 +1,21 @@
 package web.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 import web.exception.DBException;
 import web.model.Role;
-import web.model.RoleChecked;
 import web.model.User;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.servlet.ModelAndView;
 import web.model.UserRole;
 import web.service.UserService;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +31,6 @@ public class UserController{
         this.userService = userService;
     }
 
-//    @PreAuthorize("hasRole('USER')")
-//    @PreAuthorize("hasRole('ROLE__USER')")
     @PreAuthorize("hasAnyAuthority('USER')")
     @RequestMapping(value = "user", method = RequestMethod.GET)
     @ResponseBody
@@ -44,9 +41,6 @@ public class UserController{
         String j_password = (String) session.getAttribute("j_password");
         User user = userService.getUserByNameAndPassword(j_username,  j_password);
         List<Role> roles = userService.getRolesByUser(user);
-//        User user = (User) session.getAttribute("user");
-//        String name = session.getParameter("name");
-//        String password = session.getParameter("password");
         ModelAndView result = new ModelAndView("user");
         result.addObject(roles);
         result.addObject(user);
