@@ -1,6 +1,7 @@
 package web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -8,15 +9,18 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 import web.exception.DBException;
 import web.model.Role;
+import web.model.RoleChecked;
 import web.model.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.ModelAndView;
 import web.model.UserRole;
 import web.service.UserService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/")
@@ -28,6 +32,9 @@ public class UserController{
         this.userService = userService;
     }
 
+//    @PreAuthorize("hasRole('USER')")
+//    @PreAuthorize("hasRole('ROLE__USER')")
+    @PreAuthorize("hasAnyAuthority('USER')")
     @RequestMapping(value = "user", method = RequestMethod.GET)
     @ResponseBody
     public ModelAndView printCurrentUser() {
@@ -40,15 +47,13 @@ public class UserController{
 //        User user = (User) session.getAttribute("user");
 //        String name = session.getParameter("name");
 //        String password = session.getParameter("password");
-
         ModelAndView result = new ModelAndView("user");
         result.addObject(roles);
         result.addObject(user);
-
-//        model.addAttribute("roles",roles);
         return result;
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @RequestMapping(value = "users", method = RequestMethod.GET)
     @ResponseBody
     public ModelAndView printUsers() {
@@ -59,31 +64,39 @@ public class UserController{
         return result;
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @ResponseBody
     public RedirectView deleteUser(@RequestParam String id) {
+        RedirectView redirectView =  new RedirectView ("users");
+
         try {
             userService.deleteUser(Long.valueOf(id));
-        }catch (DBException e){
 
+        }catch (DBException e){
+            System.out.println(e.getLocalizedMessage());
         }
-        return  new RedirectView ("users");
+        return  redirectView;
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @RequestMapping(value = "/editing", method = RequestMethod.POST)
     @ResponseBody
     public ModelAndView editingUser(@RequestParam String edit_id) {
         User user = userService.getUserById(Long.valueOf(edit_id));
 
-        List<Role> roles = userService.getAllRoles();
-        List<Role> rolesUser = userService.getRolesByUser(user);
+//        List<Role> roles = userService.getAllRoles();
+//        List<Role> rolesUser = userService.getRolesByUser(user);
+        Map<String,Boolean> roles = userService.getRoleCheckedByUser(user);
+
         ModelAndView result = new ModelAndView("admin/editUser");
         result.addObject("user", user);
         result.addObject("roles", roles);
-        result.addObject("rolesUser", rolesUser);
+//        result.addObject("rolesUser", rolesUser);
         return result;
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     @ResponseBody
     public RedirectView editUser(@RequestParam String id, String name, String password, String email, String[] roles) {
@@ -96,6 +109,7 @@ public class UserController{
         return  new RedirectView ("users");
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @ResponseBody
     public RedirectView addUser(@RequestParam String name, String password, String email, String[] roles) {
@@ -113,6 +127,7 @@ public class UserController{
 //        return result;
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @RequestMapping(value = "addUser", method = RequestMethod.GET)
     public String printAdd(ModelMap model) {
 //        ModelAndView result = new ModelAndView("admin/users");

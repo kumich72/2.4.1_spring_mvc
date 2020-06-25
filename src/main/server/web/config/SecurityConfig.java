@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -15,6 +16,12 @@ import web.service.UserDetailServiceImp;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(
+        prePostEnabled = true
+//        ,
+//        securedEnabled = true,
+//        jsr250Enabled = true
+)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserDetailServiceImp userDetailsService;
@@ -56,8 +63,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //страницы аутентификаци доступна всем
                 .antMatchers("/login").anonymous()
                 // защищенные URL
-                .antMatchers("/admin/**").hasAuthority("ADMIN")
-                .antMatchers("/user").hasAuthority("USER")
+//                .antMatchers("/admin/** ").hasRole("ADMIN")
+//                .antMatchers("/user").hasRole("USER")
                 .antMatchers("/hello").access("hasAnyAuthority('ADMIN')").anyRequest().authenticated()
 //                .antMatchers("/hello").access("hasAnyRole('admin')").anyRequest().authenticated()
         ;

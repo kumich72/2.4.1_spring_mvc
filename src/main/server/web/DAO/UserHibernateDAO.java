@@ -80,7 +80,7 @@ public class UserHibernateDAO implements IUserDAO {
                 user.setPassword(password);
                 session.save(user);
 
-                if(deleteAllRolesUser(user)) {
+                if (deleteAllRolesUser(user)) {
                     for (String nameRole : roles) {
                         Role role = new Role();
                         role.setName(nameRole);
@@ -102,15 +102,13 @@ public class UserHibernateDAO implements IUserDAO {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         try {
-            List <Role > roles =  getRolesByUser(user);
-            for(Role role: roles)
-            {
+            List<Role> roles = getRolesByUser(user, session);
+            for (Role role : roles) {
                 session.delete(role);
             }
             transaction.commit();
             return true;
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             transaction.rollback();
         }
         return false;
@@ -125,8 +123,8 @@ public class UserHibernateDAO implements IUserDAO {
 
             User user = (User) session.load(User.class, id);
             if (user != null) {
-                List<Role> roles = getRolesByUser(user);
-                for(Role role: roles){
+                List<Role> roles = getRolesByUser(user, session);
+                for (Role role : roles) {
                     session.delete(role);
                 }
                 session.delete(user);
@@ -216,6 +214,15 @@ public class UserHibernateDAO implements IUserDAO {
     }
 
 
+    public List<Role> getRolesByUser(User user, Session session) {
+        List<Role> roles = new ArrayList<>();
+        Query query = session.createQuery("FROM Role WHERE user_id = :id");
+        query.setParameter("id", user.getId());
+        roles = query.list();
+        return roles;
+    }
+
+
     @Override
     public User getUserById(Long id) {
         Session session = sessionFactory.openSession();
@@ -292,6 +299,25 @@ public class UserHibernateDAO implements IUserDAO {
         return null;
     }
 
+    public List<String> getAllNamesRoles() {
+        List<Role> usersRoles = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        Session session = sessionFactory.openSession();
+        try {
+            Transaction transaction = session.beginTransaction();
+            usersRoles = session.createQuery("FROM Role AS r group by r.name").list();
+            transaction.commit();
+            for (Role role: usersRoles){
+                names.add(role.getName());
+            }
+            return names;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        session.close();
+        return null;
+    }
+
     @Transactional
     public boolean addRolesUser(User user, String[] roles) {
         Session session = sessionFactory.openSession();
@@ -312,5 +338,18 @@ public class UserHibernateDAO implements IUserDAO {
         }
         session.close();
         return false;
+    }
+
+    public List<String> getRolesNamesByUser(User user) {
+        List<String> names = new ArrayList<>();
+        List<Role> roles = new ArrayList<>();
+        Session session = sessionFactory.openSession();
+        Query query = session.createQuery("FROM Role WHERE user_id = :id");
+        query.setParameter("id", user.getId());
+        roles = query.list();
+        for (Role role: roles){
+            names.add(role.getName());
+        }
+        return names;
     }
 }

@@ -27,14 +27,12 @@
         </tr>
         <tr>
             <td>Role</td>
-            <td><c:forEach var="role" items="${roles}">
-                <c:forEach var="roleUser" items="${rolesUser}">
-                    <label class="checkbox">
-                        <input type="checkbox" value="${role.name}" name="roles"
-                               <c:if test="${role.name==roleUser.name}">checked="checked"</c:if>
-                        >${role.name}</label>
+            <td>
+                <c:forEach var="role" items="${roles}">
+                    <label class="checkbox"><input type="checkbox" value="${role.key}" name="roles"
+                                                   <c:if test="${role.value}">checked="checked"</c:if>>${role.key}
+                    </label>
                 </c:forEach>
-            </c:forEach>
             </td>
         </tr>
     </table>

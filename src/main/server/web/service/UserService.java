@@ -7,11 +7,14 @@ import web.DAO.IUserDAO;
 import web.DAO.UserHibernateDAO;
 import web.exception.DBException;
 import web.model.Role;
+import web.model.RoleChecked;
 import web.model.User;
 import web.model.UserRole;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService implements IUserService {
@@ -62,7 +65,6 @@ public class UserService implements IUserService {
     }
 
 
-
     public User getUserById(Long id) {
         try {
             User user = userHibernateDAO.getUserById(id);
@@ -90,11 +92,10 @@ public class UserService implements IUserService {
         List<UserRole> userRoles = new ArrayList<>();
         try {
             users = userHibernateDAO.getAllUsers();
-            for(User user : users) {
+            for (User user : users) {
                 List<Role> roles = getRolesByUser(user);
                 UserRole userRole = new UserRole(user, roles);
                 userRoles.add(userRole);
-//                user.setRole(roles);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,6 +126,45 @@ public class UserService implements IUserService {
             e.printStackTrace();
         }
         return false;
+    }
+
+    @Override
+    public Map<String, Boolean> getRoleCheckedByUser(User user) {
+        List<RoleChecked> result = new ArrayList<>();
+        Map<String, Boolean> result1 = new HashMap<String, Boolean>();
+        List<String> rolesUser = getRolesNamesByUser(user);
+        List<String> allNamesRoles = getAllRolesNames();
+
+        for (String role : allNamesRoles) {
+            for (String roleUser : rolesUser) {
+                if (allNamesRoles.contains(roleUser)) {
+                    result1.put(role, true);
+                } else {
+                    result1.put(role, false);
+                }
+            }
+        }
+        return result1;
+    }
+
+    private List<String> getRolesNamesByUser(User user) {
+        List<String> roleArrayList = new ArrayList<>();
+        try {
+            roleArrayList = userHibernateDAO.getRolesNamesByUser(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return roleArrayList;
+    }
+
+    private List<String> getAllRolesNames() {
+        List<String> roleArrayList = new ArrayList<>();
+        try {
+            roleArrayList = userHibernateDAO.getAllNamesRoles();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return roleArrayList;
     }
 
     public boolean deleteUser(Long id) throws DBException {
