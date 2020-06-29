@@ -1,9 +1,12 @@
-package web.model;
+package web.dto;
+
+import web.model.Role;
+import web.model.User;
 
 import java.util.List;
 
 public class UserRole {
-    private User User;
+    private web.model.User User;
     private List<Role> roles;
 
     public web.model.User getUser() {

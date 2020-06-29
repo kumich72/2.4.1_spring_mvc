@@ -1,4 +1,4 @@
-package web.model;
+package web.dto;
 
 public class RoleChecked {
     public String getName() {

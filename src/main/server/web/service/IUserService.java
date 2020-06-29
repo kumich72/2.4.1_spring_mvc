@@ -1,10 +1,8 @@
 package web.service;
 
-import org.hibernate.Session;
 import web.model.Role;
-import web.model.RoleChecked;
 import web.model.User;
-import web.model.UserRole;
+import web.dto.UserRole;
 
 import java.util.List;
 import java.util.Map;

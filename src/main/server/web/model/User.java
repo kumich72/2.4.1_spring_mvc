@@ -26,26 +26,9 @@ public class User implements UserDetails {
     @Column(name = "email")
     private String email;
 
-    @Autowired
-    private static UserService userService;
-//    @OneToMany(fetch = FetchType.EAGER)
-//    private List<Role> roles;
-//    @Column(name = "role")
-//    private String role;
-//    @OneToMany(mappedBy="users")
-//    @OneToMany
-//    @JoinColumn(name = "id")
-//    private List<Role> role;
-
-
-//    public List<Role> getRoles() {
-//        return roles;
-//    }
-//
-//    public void setRoles(List<Role> roles) {
-//        this.roles = roles;
-//    }
-
+//    @Access(AccessType.PROPERTY)
+    @ElementCollection(targetClass=Role.class)
+    private List<Role> roles;
     public User() {
 
     }
@@ -63,13 +46,6 @@ public class User implements UserDetails {
         this.email = email;
     }
 
-    public User(String name, String password, String email, List<Role> role) {
-        this.name = name;
-        this.password = password;
-        this.email = email;
-//        this.role = role;
-    }
-
     public long getId() {
         return id;
     }
@@ -80,8 +56,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        //return getRoles();
-        return  userService.getInstance().getRolesByUser(this);
+        return getRoles();
     }
 
     public String getPassword() {
@@ -133,16 +108,9 @@ public class User implements UserDetails {
         this.email = email;
     }
 
-
-    public List<Role> getRole() {
-        List<Role> roles = new ArrayList<Role>();
-        roles = userService.getInstance().getRolesByUser(this);
+    public List<Role> getRoles() {
         return roles;
     }
-
-//    public void setRole(List<Role> roles) {
-//        this.roles = roles;
-//    }
 
     @Override
     public boolean equals(Object o) {
@@ -169,7 +137,5 @@ public class User implements UserDetails {
                 '}';
     }
 
-    public boolean isAdmin() {
-           return userService.getInstance().userIsAdmin(this);
-    }
+
 }

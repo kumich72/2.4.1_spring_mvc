@@ -1,15 +1,16 @@
 package web.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import web.DAO.IUserDAO;
 //import web.DAO.UserDaoFactory;
 import web.DAO.UserHibernateDAO;
 import web.exception.DBException;
 import web.model.Role;
-import web.model.RoleChecked;
 import web.model.User;
-import web.model.UserRole;
+import web.dto.UserRole;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class UserService implements IUserService {
+public class UserService implements IUserService, UserDetailsService {
 
     private static UserService userService;
     @Autowired
@@ -28,6 +29,21 @@ public class UserService implements IUserService {
             userService = new UserService();
         }
         return userService;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+        User user = findByUsername(userName);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        List<Role> roles = getRolesByUser(user);
+        UserDetails userDetails =
+                new org.springframework.security.core.userdetails.User(userName,
+                        user.getPassword(),
+                        roles);
+
+        return userDetails;
     }
 
     @Override

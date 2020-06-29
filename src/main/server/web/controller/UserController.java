@@ -14,8 +14,9 @@ import org.springframework.web.servlet.view.RedirectView;
 import web.exception.DBException;
 import web.model.Role;
 import web.model.User;
-import web.model.UserRole;
+import web.dto.UserRole;
 import web.service.UserService;
+
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +24,9 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/")
-public class UserController{
+public class UserController {
 
-    private final UserService  userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -39,7 +40,7 @@ public class UserController{
         HttpSession session = attr.getRequest().getSession();
         String j_username = (String) session.getAttribute("j_username");
         String j_password = (String) session.getAttribute("j_password");
-        User user = userService.getUserByNameAndPassword(j_username,  j_password);
+        User user = userService.getUserByNameAndPassword(j_username, j_password);
         List<Role> roles = userService.getRolesByUser(user);
         ModelAndView result = new ModelAndView("user");
         result.addObject(roles);
@@ -51,7 +52,6 @@ public class UserController{
     @RequestMapping(value = "users", method = RequestMethod.GET)
     @ResponseBody
     public ModelAndView printUsers() {
-//        UserService userService = new UserService();
         List<UserRole> userRoles = userService.getAllUsersAndRoles();
         ModelAndView result = new ModelAndView("admin/users");
         result.addObject("userRoles", userRoles);
@@ -62,15 +62,15 @@ public class UserController{
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @ResponseBody
     public RedirectView deleteUser(@RequestParam String id) {
-        RedirectView redirectView =  new RedirectView ("users");
+        RedirectView redirectView = new RedirectView("users");
 
         try {
             userService.deleteUser(Long.valueOf(id));
 
-        }catch (DBException e){
+        } catch (DBException e) {
             System.out.println(e.getLocalizedMessage());
         }
-        return  redirectView;
+        return redirectView;
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
@@ -78,15 +78,10 @@ public class UserController{
     @ResponseBody
     public ModelAndView editingUser(@RequestParam String edit_id) {
         User user = userService.getUserById(Long.valueOf(edit_id));
-
-//        List<Role> roles = userService.getAllRoles();
-//        List<Role> rolesUser = userService.getRolesByUser(user);
-        Map<String,Boolean> roles = userService.getRoleCheckedByUser(user);
-
+        Map<String, Boolean> roles = userService.getRoleCheckedByUser(user);
         ModelAndView result = new ModelAndView("admin/editUser");
         result.addObject("user", user);
         result.addObject("roles", roles);
-//        result.addObject("rolesUser", rolesUser);
         return result;
     }
 
@@ -96,11 +91,11 @@ public class UserController{
     public RedirectView editUser(@RequestParam String id, String name, String password, String email, String[] roles) {
         ModelAndView result = new ModelAndView("admin/users");
         try {
-            userService.editUser(Long.valueOf(id), name, password, email, roles );
-        }catch (DBException e){
+            userService.editUser(Long.valueOf(id), name, password, email, roles);
+        } catch (DBException e) {
             result.addObject("error", e.getLocalizedMessage());
         }
-        return  new RedirectView ("users");
+        return new RedirectView("users");
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
@@ -109,24 +104,21 @@ public class UserController{
     public RedirectView addUser(@RequestParam String name, String password, String email, String[] roles) {
         ModelAndView result = new ModelAndView("admin/users");
         try {
-            User user = new User(name,password, email);
-            userService.addRolesUser(user,roles);
-        }catch (Exception e){
+            User user = new User(name, password, email);
+            userService.addRolesUser(user, roles);
+        } catch (Exception e) {
             result.addObject("error", e.getLocalizedMessage());
         }
         List<User> users = userService.getAllUsers();
 
         result.addObject("users", users);
-        return  new RedirectView ("users");
-//        return result;
+        return new RedirectView("users");
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @RequestMapping(value = "addUser", method = RequestMethod.GET)
     public String printAdd(ModelMap model) {
-//        ModelAndView result = new ModelAndView("admin/users");
         List<Role> roles = userService.getAllRoles();
-
         model.addAttribute("roles", roles);
         return "admin/addUser";
     }

@@ -1,6 +1,5 @@
 package web.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -12,24 +11,25 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import web.config.handler.LoginSuccessHandler;
-import web.service.UserDetailServiceImp;
+import web.service.UserService;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
         prePostEnabled = true
-//        ,
-//        securedEnabled = true,
-//        jsr250Enabled = true
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    UserDetailServiceImp userDetailsService;
+
+    private final UserService userService;
+
+    public SecurityConfig(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         //auth.inMemoryAuthentication().withUser("ADMIN").password("ADMIN").roles("ADMIN");
-        auth.userDetailsService(userDetailsService);
+        auth.userDetailsService(userService);
     }
 
     @Override
@@ -63,10 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //страницы аутентификаци доступна всем
                 .antMatchers("/login").anonymous()
                 // защищенные URL
-//                .antMatchers("/admin/** ").hasRole("ADMIN")
-//                .antMatchers("/user").hasRole("USER")
                 .antMatchers("/hello").access("hasAnyAuthority('ADMIN')").anyRequest().authenticated()
-//                .antMatchers("/hello").access("hasAnyRole('admin')").anyRequest().authenticated()
         ;
     }
 
