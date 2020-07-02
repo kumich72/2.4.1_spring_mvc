@@ -25,13 +25,13 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
                                         HttpServletResponse httpServletResponse,
                                         Authentication authentication) throws IOException, ServletException {
         List<Role> roles = (List<Role>) authentication.getAuthorities();
-        String j_username = httpServletRequest.getParameter("j_username");
-        String j_password = httpServletRequest.getParameter("j_password");
+        String username = httpServletRequest.getParameter("j_username");
+        String password = httpServletRequest.getParameter("j_password");
 
         HttpSession session = httpServletRequest.getSession();
 
-        session.setAttribute("j_username", j_username);
-        session.setAttribute("j_password", j_password);
+        session.setAttribute("username", username);
+        session.setAttribute("password", password);
 
         boolean isHaveAdmin = roles.stream().anyMatch(e -> e.getName().equals("ADMIN"));
         if(isHaveAdmin){
