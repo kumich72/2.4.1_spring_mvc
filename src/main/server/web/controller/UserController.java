@@ -3,10 +3,7 @@ package web.controller;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
@@ -16,7 +13,6 @@ import web.model.Role;
 import web.model.User;
 import web.dto.UserRole;
 import web.service.UserService;
-
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +29,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyAuthority('USER')")
-    @RequestMapping(value = "user", method = RequestMethod.GET)
+    @GetMapping(value = "user")
     @ResponseBody
     public ModelAndView printCurrentUser() {
         ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
@@ -49,7 +45,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @RequestMapping(value = "users", method = RequestMethod.GET)
+    @GetMapping(value = "users")
     @ResponseBody
     public ModelAndView printUsers() {
         List<UserRole> userRoles = userService.getAllUsersAndRoles();
@@ -59,7 +55,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @PostMapping(value = "/delete")
     @ResponseBody
     public RedirectView deleteUser(@RequestParam String id) {
         RedirectView redirectView = new RedirectView("users");
@@ -74,7 +70,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @RequestMapping(value = "/editing", method = RequestMethod.POST)
+    @PostMapping(value = "/editing")
     @ResponseBody
     public ModelAndView editingUser(@RequestParam String edit_id) {
         User user = userService.getUserById(Long.valueOf(edit_id));
@@ -86,7 +82,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @RequestMapping(value = "/edit", method = RequestMethod.POST)
+    @PostMapping(value = "/edit")
     @ResponseBody
     public RedirectView editUser(@RequestParam String id, String name, String password, String email, String[] roles) {
         ModelAndView result = new ModelAndView("admin/users");
@@ -99,7 +95,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @PostMapping(value = "/add")
     @ResponseBody
     public RedirectView addUser(@RequestParam String name, String password, String email, String[] roles) {
         ModelAndView result = new ModelAndView("admin/users");
@@ -116,14 +112,14 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @RequestMapping(value = "addUser", method = RequestMethod.GET)
+    @GetMapping(value = "addUser")
     public String printAdd(ModelMap model) {
         List<Role> roles = userService.getAllRoles();
         model.addAttribute("roles", roles);
         return "admin/addUser";
     }
 
-    @RequestMapping(value = "hello", method = RequestMethod.GET)
+    @GetMapping(value = "hello")
     public String printWelcome(ModelMap model) {
         List<String> messages = new ArrayList<>();
         messages.add("Hello!");
@@ -133,7 +129,7 @@ public class UserController {
         return "hello";
     }
 
-    @RequestMapping(value = "login", method = RequestMethod.GET)
+    @GetMapping(value = "login")
     public String loginPage() {
         return "login";
     }

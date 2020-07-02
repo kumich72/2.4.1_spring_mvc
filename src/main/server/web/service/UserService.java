@@ -12,6 +12,9 @@ import web.model.Role;
 import web.model.User;
 import web.dto.UserRole;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +22,9 @@ import java.util.Map;
 
 @Service
 public class UserService implements IUserService, UserDetailsService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private static UserService userService;
     @Autowired
@@ -151,11 +157,7 @@ public class UserService implements IUserService, UserDetailsService {
         List<String> allNamesRoles = getAllRolesNames();
 
         for (String role : allNamesRoles) {
-            if (rolesUser.contains(role)) {
-                result.put(role, true);
-            } else {
-                result.put(role, false);
-            }
+            result.put(role, rolesUser.contains(role));
         }
         return result;
     }
@@ -180,6 +182,7 @@ public class UserService implements IUserService, UserDetailsService {
         return roleArrayList;
     }
 
+    @Transactional
     public boolean deleteUser(Long id) throws DBException {
         try {
             if (userHibernateDAO.deleteUser(id)) {
@@ -191,6 +194,7 @@ public class UserService implements IUserService, UserDetailsService {
         return false;
     }
 
+    @Transactional
     public boolean addUser(User user) throws DBException {
         try {
             if (userHibernateDAO.addUser(user)) {
@@ -203,6 +207,7 @@ public class UserService implements IUserService, UserDetailsService {
         }
     }
 
+    @Transactional
     public boolean editUser(Long id, String name, String password, String email, String[] roles) throws DBException {
         try {
             if (userHibernateDAO.editUser(id, name, password, email, roles)) {

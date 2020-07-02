@@ -69,7 +69,6 @@ public class UserHibernateDAO implements IUserDAO {
         return false;
     }
 
-    @Transactional
     public boolean editUser(Long id, String name, String email, String password, String[] roles) {
         try {
             Session session = sessionFactory.openSession();
@@ -318,7 +317,7 @@ public class UserHibernateDAO implements IUserDAO {
         return null;
     }
 
-    @Transactional
+
     public boolean addRolesUser(User user, String[] roles) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();

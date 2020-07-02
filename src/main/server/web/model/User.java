@@ -1,13 +1,9 @@
 package web.model;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import web.service.UserService;
-
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -26,7 +22,6 @@ public class User implements UserDetails {
     @Column(name = "email")
     private String email;
 
-//    @Access(AccessType.PROPERTY)
     @ElementCollection(targetClass=Role.class)
     private List<Role> roles;
     public User() {
@@ -123,7 +118,6 @@ public class User implements UserDetails {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(getName(), getId());
     }
 
@@ -136,6 +130,4 @@ public class User implements UserDetails {
                 ", email='" + email + '\'' +
                 '}';
     }
-
-
 }

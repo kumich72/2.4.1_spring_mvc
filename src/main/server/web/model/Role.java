@@ -8,20 +8,15 @@ import javax.persistence.*;
 @Table(name = "roles")
 public class Role implements GrantedAuthority {
     @Id
-//    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "role_id")
     private long id;
     @Column(name = "name")
     private String name;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id",foreignKey=@ForeignKey(name="ROLE_ID_FK"))
     private User user;
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name="role_id", nullable=false)
-//    private User user;
 
     public Role() {
 
