@@ -13,8 +13,8 @@
 <body>
 
 <form method="post" action="/login">
-    <input name="j_username"/>
-    <input name="j_password"/>
+    <input name="username"/>
+    <input name="password"/>
     <input type="submit"/>
 </form>
 

@@ -22,20 +22,24 @@
         <th>Delete</th>
         <th>Edit</th>
     </tr>
-    <c:forEach items="${users}" var="user">
+    <c:forEach items="${userRoles}" var="userRole">
         <tr>
-            <td>${user.id}</td>
-            <td>${user.name}</td>
-            <td>${user.email}</td>
-            <td>${user.password}</td>
-<%--            <td>${user.role}</td>--%>
+            <td>${userRole.user.id}</td>
+            <td>${userRole.user.name}</td>
+            <td>${userRole.user.email}</td>
+            <td>${userRole.user.password}</td>
+            <td>
+                <c:forEach items="${userRole.roles}" var="role">
+                    <h1>${role.name}</h1>
+                </c:forEach>
+            </td>
             <td><form action="delete" method="POST">
                 <button type="submit">Delete</button>
-                <input type="hidden" id="id" name="id" value="${user.id}">
+                <input type="hidden" id="id" name="id" value="${userRole.user.id}">
             </form></td>
             <td><form action="editing" method="POST">
                 <button type="submit">Edit</button>
-                <input type="hidden" id="edit_id"  name="edit_id" value="${user.id}">
+                <input type="hidden" id="edit_id"  name="edit_id" value="${userRole.user.id}">
             </form></td>
         </tr>
     </c:forEach>

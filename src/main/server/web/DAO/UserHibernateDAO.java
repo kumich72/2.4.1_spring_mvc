@@ -1,52 +1,20 @@
 package web.DAO;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.hibernate.*;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Component;
-import web.config.HibernateConfig;
 import web.model.Role;
 import web.model.User;
-import org.hibernate.*;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.service.ServiceRegistry;
-
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class UserHibernateDAO implements IUserDAO {
-    private static SessionFactory sessionFactory;
-    private Configuration configuration;
+    private final SessionFactory sessionFactory;
 
-    @Autowired
-    public UserHibernateDAO() {
-        if (configuration == null) {
-            ApplicationContext ctx = new AnnotationConfigApplicationContext(HibernateConfig.class);
-            configuration = (Configuration) ctx.getBean("getConfiguration");
-        }
-        if (sessionFactory == null) {
-            sessionFactory = createSessionFactory();
-        }
-    }
-
-    public UserHibernateDAO(Configuration configuration) {
-        if (configuration != null) {
-            this.configuration = configuration;
-        }
-        if (sessionFactory == null) {
-            sessionFactory = createSessionFactory();
-        }
-    }
-
-    private SessionFactory createSessionFactory() {
-        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
-        builder.applySettings(configuration.getProperties());
-        ServiceRegistry serviceRegistry = builder.build();
-        return configuration.buildSessionFactory(serviceRegistry);
+    public UserHibernateDAO(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public boolean addUser(String name, String email, String password) {

@@ -25,8 +25,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
                                         HttpServletResponse httpServletResponse,
                                         Authentication authentication) throws IOException, ServletException {
         List<Role> roles = (List<Role>) authentication.getAuthorities();
-        String username = httpServletRequest.getParameter("j_username");
-        String password = httpServletRequest.getParameter("j_password");
+        String username = httpServletRequest.getParameter("username");
+        String password = httpServletRequest.getParameter("password");
 
         HttpSession session = httpServletRequest.getSession();
 

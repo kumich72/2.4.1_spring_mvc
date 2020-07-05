@@ -1,5 +1,5 @@
 <%@ page import="java.util.List" %>
-<%@ page import="web.model.User " %>
+<%@ page import="web.model.User" %>
 <%@ page import="web.model.Role" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -43,14 +43,6 @@
         </tbody>
     </table>
     <br>
-    <c:if test="${user.admin == true}">
-        <form action="/admin" method="POST">
-            <input type="hidden" id="id" name="id" value="${user.id}">
-            <input type="hidden" id="name" name="name" value="${user.name}">
-            <input type="hidden" id="password" name="password" value="${user.password}">
-            <button type="submit">Перейти на список пользователей</button>
-        </form>
-    </c:if>
 </h1>
 <a href="<c:url value="/logout" />">Logout</a>
 </body>

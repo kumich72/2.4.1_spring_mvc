@@ -34,9 +34,9 @@ public class UserController {
     public ModelAndView printCurrentUser() {
         ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         HttpSession session = attr.getRequest().getSession();
-        String j_username = (String) session.getAttribute("j_username");
-        String j_password = (String) session.getAttribute("j_password");
-        User user = userService.getUserByNameAndPassword(j_username, j_password);
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
+        User user = userService.getUserByNameAndPassword(username, password);
         List<Role> roles = userService.getRolesByUser(user);
         ModelAndView result = new ModelAndView("user");
         result.addObject(roles);

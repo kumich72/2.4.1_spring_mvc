@@ -1,16 +1,20 @@
 package web.config;
 
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Environment;
+import org.hibernate.service.ServiceRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import web.model.Role;
 import web.model.User;
 
 @Configuration
 public class HibernateConfig {
-
-    @Bean
-    public org.hibernate.cfg.Configuration getConfiguration() {
+    private org.hibernate.cfg.Configuration getConfiguration() {
         org.hibernate.cfg.Configuration configuration = new org.hibernate.cfg.Configuration();
         configuration
                 .addAnnotatedClass(User.class)
@@ -25,5 +29,14 @@ public class HibernateConfig {
 //            configuration.setProperty("hibernate.hbm2ddl.auto", "create");
         configuration.setProperty("hibernate.hbm2ddl.auto", "update");
         return configuration;
+    }
+
+    @Bean
+    public SessionFactory getSessionFactory() {
+        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
+        org.hibernate.cfg.Configuration configuration =  getConfiguration();
+        builder.applySettings(configuration.getProperties());
+        ServiceRegistry serviceRegistry = builder.build();
+        return configuration.buildSessionFactory(serviceRegistry);
     }
 }
