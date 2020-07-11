@@ -8,12 +8,22 @@ import web.model.Role;
 import web.model.User;
 import web.repository.RoleRepository;
 import web.repository.UserRepository;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class UserHibernateDAO  implements IUserDAO {
+
+//    static EntityManagerFactory emf = Persistence.createEntityManagerFactory("User");
+//
+//    public static EntityManager getEntityManager() {
+//        return emf.createEntityManager();
+//    }
     private final SessionFactory sessionFactory;
 
     public final UserRepository userRepository;
@@ -74,8 +84,9 @@ public class UserHibernateDAO  implements IUserDAO {
 
                 user.setEmail(email);
                 user.setPassword(password);
-                userRepository.save(user);
-//                session.save(user);
+//                userRepository.save(user);
+
+                session.save(user);
 
                 if (deleteAllRolesUser(user)) {
                     for (String nameRole : roles) {

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -23,7 +24,16 @@ class AppConfig {
 
     @Bean
     public DataSource dataSource() {
-        return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+
+//        dataSource.setDriverClassName("com.mysql.cj.jdbc.Drive");
+        dataSource.setUsername("root");
+
+        dataSource.setPassword("root");
+        dataSource.setUrl(
+                "hibernate.connection.url\", \"jdbc:mysql://localhost:3306/db_example?useUnicode=true&serverTimezone=UTC&useSSL=true&verifyServerCertificate=false");
+
+        return dataSource;
     }
 
     @Bean
