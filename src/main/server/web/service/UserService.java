@@ -23,8 +23,10 @@ import java.util.Map;
 @Service
 public class UserService implements IUserService, UserDetailsService {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+//    @PersistenceContext
+//    private EntityManager entityManager;
+
+//    private final TransactionTemplate transactionTemplate;
 
     private static UserService userService;
     @Autowired
@@ -137,6 +139,7 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
+    @Transactional
     public boolean addRolesUser(User user, String[] roles) {
         try {
             if (userHibernateDAO.addRolesUser(user, roles)) {

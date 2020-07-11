@@ -2,22 +2,33 @@ package web.DAO;
 
 import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import web.model.Role;
 import web.model.User;
+import web.repository.RoleRepository;
+import web.repository.UserRepository;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class UserHibernateDAO implements IUserDAO {
+public class UserHibernateDAO  implements IUserDAO {
     private final SessionFactory sessionFactory;
 
-    public UserHibernateDAO(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
+    public final UserRepository userRepository;
+    public final RoleRepository roleRepository;
 
-    public boolean addUser(String name, String email, String password) {
+    public UserHibernateDAO(SessionFactory sessionFactory, UserRepository userRepository, RoleRepository roleRepository) {
+        this.sessionFactory = sessionFactory;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+    }
+//    public UserHibernateDAO(SessionFactory sessionFactory) {
+//        this.sessionFactory = sessionFactory;
+//    }
+
+    public boolean addUserOld(String name, String email, String password) {
         try {
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
@@ -37,27 +48,17 @@ public class UserHibernateDAO implements IUserDAO {
         return false;
     }
 
-    public boolean editUser(Long id, String name, String email, String password, String[] roles) {
+    public boolean addUser(String name, String email, String password) {
         try {
-            Session session = sessionFactory.openSession();
-            User user = (User) session.load(User.class, id);
-            if (user != null) {
-                Transaction transaction = session.beginTransaction();
-                user.setEmail(email);
-                user.setPassword(password);
-                session.save(user);
-
-                if (deleteAllRolesUser(user)) {
-                    for (String nameRole : roles) {
-                        Role role = new Role();
-                        role.setName(nameRole);
-                        role.setUser(user);
-                        session.save(role);
-                    }
-                }
-                transaction.commit();
-                session.close();
+            User user = new User();
+            user.setEmail(email);
+            user.setName(name);
+            user.setPassword(password);
+            if (!checkUserExist(name)) {
+                userRepository.save(user);
                 return true;
+            }else {
+                return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,19 +66,51 @@ public class UserHibernateDAO implements IUserDAO {
         return false;
     }
 
+    public boolean editUser(Long id, String name, String email, String password, String[] roles) {
+        Session session = sessionFactory.openSession();
+        try {
+            User user = (User) session.load(User.class, id);
+            if (user != null) {
+
+                user.setEmail(email);
+                user.setPassword(password);
+                userRepository.save(user);
+//                session.save(user);
+
+                if (deleteAllRolesUser(user)) {
+                    for (String nameRole : roles) {
+                        Role role = new Role();
+                        role.setName(nameRole);
+                        role.setUser(user);
+                        roleRepository.save(role);
+//                        session.save(role);
+                    }
+                }
+                session.close();
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        session.close();
+        return false;
+    }
+
     private boolean deleteAllRolesUser(User user) {
         Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
+
         try {
             List<Role> roles = getRolesByUser(user, session);
             for (Role role : roles) {
-                session.delete(role);
+                //session.delete(role);
+                roleRepository.delete(role);
             }
-            transaction.commit();
+            session.close();
             return true;
         } catch (Exception e) {
-            transaction.rollback();
+
         }
+        session.close();
         return false;
     }
 
@@ -85,9 +118,8 @@ public class UserHibernateDAO implements IUserDAO {
     @Transactional
     public boolean deleteUser(Long id) {
         Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        try {
 
+        try {
             User user = (User) session.load(User.class, id);
             if (user != null) {
                 List<Role> roles = getRolesByUser(user, session);
@@ -95,12 +127,11 @@ public class UserHibernateDAO implements IUserDAO {
                     session.delete(role);
                 }
                 session.delete(user);
-                transaction.commit();
+                session.close();
                 return true;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            transaction.rollback();
         }
         session.close();
         return false;
@@ -109,14 +140,15 @@ public class UserHibernateDAO implements IUserDAO {
     @Override
     public boolean userIsAdmin(String name, String password) {
         try {
+            int count = 0;
             Session session = sessionFactory.openSession();
-            Criteria criteria = session.createCriteria(User.class);
-            int count = criteria
-                    .add(Restrictions.eq("name", name))
-                    .add(Restrictions.eq("password", password))
-                    .add(Restrictions.eq("role", "admin"))
-                    .list()
-                    .size();
+//            Criteria criteria = session.createCriteria(User.class);
+//            int count = criteria
+//                    .add(Restrictions.eq("name", name))
+//                    .add(Restrictions.eq("password", password))
+//                    .add(Restrictions.eq("role", "admin"))
+//                    .list()
+//                    .size();
             if (count > 0) {
                 return true;
             } else {
@@ -132,7 +164,7 @@ public class UserHibernateDAO implements IUserDAO {
     public User getUserByNameAndPassword(String name, String password) {
         Session session = sessionFactory.openSession();
         try {
-            Query query = session.createQuery("FROM User WHERE name = :name AND password = :password ");
+            Query query = (Query) session.createQuery("FROM User WHERE name = :name AND password = :password ");
             query.setParameter("name", name);
             query.setParameter("password", password);
             List<User> list = query.list();
@@ -156,7 +188,7 @@ public class UserHibernateDAO implements IUserDAO {
     public User getUserByName(String name) {
         Session session = sessionFactory.openSession();
         try {
-            Query query = session.createQuery("FROM User WHERE name = :name");
+            Query query = (Query) session.createQuery("FROM User WHERE name = :name");
             query.setParameter("name", name);
             List<User> list = query.list();
 
@@ -174,7 +206,7 @@ public class UserHibernateDAO implements IUserDAO {
     public List<Role> getRolesByUser(User user) {
         List<Role> roles = new ArrayList<>();
         Session session = sessionFactory.openSession();
-        Query query = session.createQuery("FROM Role WHERE user_id = :id");
+        Query query = (Query) session.createQuery("FROM Role WHERE user_id = :id");
         query.setParameter("id", user.getId());
         roles = query.list();
         return roles;
@@ -183,7 +215,7 @@ public class UserHibernateDAO implements IUserDAO {
 
     public List<Role> getRolesByUser(User user, Session session) {
         List<Role> roles = new ArrayList<>();
-        Query query = session.createQuery("FROM Role WHERE user_id = :id");
+        Query query = (Query) session.createQuery("FROM Role WHERE user_id = :id");
         query.setParameter("id", user.getId());
         roles = query.list();
         return roles;
@@ -209,9 +241,8 @@ public class UserHibernateDAO implements IUserDAO {
         List<User> users = new ArrayList<>();
         Session session = sessionFactory.openSession();
         try {
-            Transaction transaction = session.beginTransaction();
             users = session.createQuery("FROM User").list();
-            transaction.commit();
+            session.close();
             return users;
         } catch (Exception e) {
             e.printStackTrace();
@@ -220,14 +251,23 @@ public class UserHibernateDAO implements IUserDAO {
         return null;
     }
 
+    public boolean addUserOld(User user) {
+        Session session = sessionFactory.openSession();
+        try {
+            session.save(user);
+            session.close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        session.close();
+        return false;
+    }
+
     @Override
     public boolean addUser(User user) {
         try {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            session.save(user);
-            transaction.commit();
-            session.close();
+//            userRepository.save(user);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -238,8 +278,9 @@ public class UserHibernateDAO implements IUserDAO {
     private boolean checkUserExist(String name) {
         try {
             Session session = sessionFactory.openSession();
-            Criteria criteria = session.createCriteria(User.class);
-            int count = criteria.add(Restrictions.eq("name", name)).list().size();
+            int count =0;
+//            Criteria criteria = session.createCriteria(User.class);
+//            int count = criteria.add(Restrictions.eq("name", name)).list().size();
             if (count > 0) {
                 return true;
             } else {
@@ -255,9 +296,7 @@ public class UserHibernateDAO implements IUserDAO {
         List<Role> users = new ArrayList<>();
         Session session = sessionFactory.openSession();
         try {
-            Transaction transaction = session.beginTransaction();
             users = session.createQuery("FROM Role AS r group by r.name").list();
-            transaction.commit();
             return users;
         } catch (Exception e) {
             e.printStackTrace();
@@ -271,9 +310,7 @@ public class UserHibernateDAO implements IUserDAO {
         List<String> names = new ArrayList<>();
         Session session = sessionFactory.openSession();
         try {
-            Transaction transaction = session.beginTransaction();
             usersRoles = session.createQuery("FROM Role AS r group by r.name").list();
-            transaction.commit();
             for (Role role: usersRoles){
                 names.add(role.getName());
             }
@@ -288,7 +325,6 @@ public class UserHibernateDAO implements IUserDAO {
 
     public boolean addRolesUser(User user, String[] roles) {
         Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
         try {
             session.save(user);
             for (String name : roles) {
@@ -296,12 +332,13 @@ public class UserHibernateDAO implements IUserDAO {
                 role.setName(name);
                 role.setUser(user);
                 session.save(role);
+                session.close();
             }
-            transaction.commit();
+            session.close();
             return true;
-        } catch (Exception e) {
-            transaction.rollback();
-            e.printStackTrace();
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
         }
         session.close();
         return false;
@@ -311,7 +348,7 @@ public class UserHibernateDAO implements IUserDAO {
         List<String> names = new ArrayList<>();
         List<Role> roles = new ArrayList<>();
         Session session = sessionFactory.openSession();
-        Query query = session.createQuery("FROM Role WHERE user_id = :id");
+        Query query = (Query) session.createQuery("FROM Role WHERE user_id = :id");
         query.setParameter("id", user.getId());
         roles = query.list();
         for (Role role: roles){

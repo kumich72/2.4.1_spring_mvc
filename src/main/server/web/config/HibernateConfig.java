@@ -20,9 +20,10 @@ public class HibernateConfig {
                 .addAnnotatedClass(User.class)
                 .addAnnotatedClass(Role.class);
 
-        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLInnoDBDialect");
         configuration.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
-        configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/db_example?useUnicode=true&serverTimezone=UTC&useSSL=true&verifyServerCertificate=false");
+        configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/db_example?useUnicode=true&serverTimezone=UTC&useSSL=true&verifyServerCertificate=false&DB_CLOSE_DELAY=-1");
+
         configuration.setProperty("hibernate.connection.username", "root");
         configuration.setProperty("hibernate.connection.password", "root");
         configuration.setProperty("hibernate.show_sql", "true");
@@ -31,8 +32,8 @@ public class HibernateConfig {
         return configuration;
     }
 
-    @Bean
-    public SessionFactory getSessionFactory() {
+    @Bean(name = "getSessionHibernateFactory")
+    public SessionFactory getSessionHibernateFactory() {
         StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
         org.hibernate.cfg.Configuration configuration =  getConfiguration();
         builder.applySettings(configuration.getProperties());
