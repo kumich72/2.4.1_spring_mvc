@@ -15,15 +15,11 @@ import javax.persistence.Persistence;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class UserHibernateDAO  implements IUserDAO {
 
-//    static EntityManagerFactory emf = Persistence.createEntityManagerFactory("User");
-//
-//    public static EntityManager getEntityManager() {
-//        return emf.createEntityManager();
-//    }
     private final SessionFactory sessionFactory;
 
     public final UserRepository userRepository;
@@ -77,74 +73,59 @@ public class UserHibernateDAO  implements IUserDAO {
     }
 
     public boolean editUser(Long id, String name, String email, String password, String[] roles) {
-        Session session = sessionFactory.openSession();
         try {
-            User user = (User) session.load(User.class, id);
-            if (user != null) {
-
+            Optional<User> userFind = userRepository.findById(id);
+            if (userFind.isPresent()) {
+                User user = userFind.get();
                 user.setEmail(email);
                 user.setPassword(password);
-//                userRepository.save(user);
-
-                session.save(user);
-
+                userRepository.save(user);
                 if (deleteAllRolesUser(user)) {
                     for (String nameRole : roles) {
                         Role role = new Role();
                         role.setName(nameRole);
                         role.setUser(user);
                         roleRepository.save(role);
-//                        session.save(role);
                     }
                 }
-                session.close();
                 return true;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        session.close();
         return false;
     }
 
     private boolean deleteAllRolesUser(User user) {
-        Session session = sessionFactory.openSession();
-
         try {
-            List<Role> roles = getRolesByUser(user, session);
+            List<Role> roles = getRolesByUser(user);
             for (Role role : roles) {
-                //session.delete(role);
                 roleRepository.delete(role);
             }
-            session.close();
             return true;
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
-        session.close();
         return false;
     }
 
 
     @Transactional
     public boolean deleteUser(Long id) {
-        Session session = sessionFactory.openSession();
-
         try {
-            User user = (User) session.load(User.class, id);
-            if (user != null) {
-                List<Role> roles = getRolesByUser(user, session);
+            Optional<User> userFind = userRepository.findById(id);
+            if (userFind.isPresent()) {
+                User user = userFind.get();
+                List<Role> roles = getRolesByUser(user);
                 for (Role role : roles) {
-                    session.delete(role);
+                    roleRepository.delete(role);
                 }
-                session.delete(user);
-                session.close();
+                userRepository.delete(user);
                 return true;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        session.close();
         return false;
     }
 
@@ -216,22 +197,9 @@ public class UserHibernateDAO  implements IUserDAO {
     @Override
     public List<Role> getRolesByUser(User user) {
         List<Role> roles = new ArrayList<>();
-        Session session = sessionFactory.openSession();
-        Query query = (Query) session.createQuery("FROM Role WHERE user_id = :id");
-        query.setParameter("id", user.getId());
-        roles = query.list();
+        roles = roleRepository.findByUser(user);
         return roles;
     }
-
-
-    public List<Role> getRolesByUser(User user, Session session) {
-        List<Role> roles = new ArrayList<>();
-        Query query = (Query) session.createQuery("FROM Role WHERE user_id = :id");
-        query.setParameter("id", user.getId());
-        roles = query.list();
-        return roles;
-    }
-
 
     @Override
     public User getUserById(Long id) {
