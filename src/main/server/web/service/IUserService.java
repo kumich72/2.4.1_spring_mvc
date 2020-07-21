@@ -18,7 +18,7 @@ public interface IUserService {
 
     List<UserRole> getAllUsersAndRoles();
 
-    List<Role> getAllRoles();
+    List<String> getAllRoles();
 
     boolean addRolesUser(User user, String[] roles);
 

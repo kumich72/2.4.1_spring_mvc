@@ -5,15 +5,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-//import web.DAO.UserDaoFactory;
 import web.DAO.UserHibernateDAO;
+import web.dto.UserRole;
 import web.exception.DBException;
 import web.model.Role;
 import web.model.User;
-import web.dto.UserRole;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,11 +18,6 @@ import java.util.Map;
 
 @Service
 public class UserService implements IUserService, UserDetailsService {
-
-//    @PersistenceContext
-//    private EntityManager entityManager;
-
-//    private final TransactionTemplate transactionTemplate;
 
     private static UserService userService;
     @Autowired
@@ -128,8 +119,8 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public List<Role> getAllRoles() {
-        List<Role> roleArrayList = new ArrayList<>();
+    public List<String> getAllRoles() {
+        List<String> roleArrayList = new ArrayList<>();
         try {
             roleArrayList = userHibernateDAO.getAllRoles();
         } catch (Exception e) {
@@ -137,6 +128,7 @@ public class UserService implements IUserService, UserDetailsService {
         }
         return roleArrayList;
     }
+
 
     @Override
     @Transactional

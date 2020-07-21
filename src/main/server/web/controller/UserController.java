@@ -2,6 +2,7 @@ package web.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -47,11 +48,13 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @GetMapping(value = "users")
     @ResponseBody
-    public ModelAndView printUsers() {
+    public ModelAndView printUsers(Model model) {
         List<UserRole> userRoles = userService.getAllUsersAndRoles();
-        ModelAndView result = new ModelAndView("admin/users");
-        result.addObject("userRoles", userRoles);
-        return result;
+        model.addAttribute("userRoles", userRoles);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("users");
+        modelAndView.addObject("userRoles", userRoles);
+        return modelAndView;
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
@@ -59,7 +62,6 @@ public class UserController {
     @ResponseBody
     public RedirectView deleteUser(@RequestParam String id) {
         RedirectView redirectView = new RedirectView("users");
-
         try {
             userService.deleteUser(Long.valueOf(id));
 
@@ -75,7 +77,7 @@ public class UserController {
     public ModelAndView editingUser(@RequestParam String edit_id) {
         User user = userService.getUserById(Long.valueOf(edit_id));
         Map<String, Boolean> roles = userService.getRoleCheckedByUser(user);
-        ModelAndView result = new ModelAndView("admin/editUser");
+        ModelAndView result = new ModelAndView("editUser");
         result.addObject("user", user);
         result.addObject("roles", roles);
         return result;
@@ -85,7 +87,7 @@ public class UserController {
     @PostMapping(value = "/edit")
     @ResponseBody
     public RedirectView editUser(@RequestParam String id, String name, String password, String email, String[] roles) {
-        ModelAndView result = new ModelAndView("admin/users");
+        ModelAndView result = new ModelAndView("users");
         try {
             userService.editUser(Long.valueOf(id), name, password, email, roles);
         } catch (DBException e) {
@@ -98,7 +100,7 @@ public class UserController {
     @PostMapping(value = "/add")
     @ResponseBody
     public RedirectView addUser(@RequestParam String name, String password, String email, String[] roles) {
-        ModelAndView result = new ModelAndView("admin/users");
+        ModelAndView result = new ModelAndView("users");
         try {
             User user = new User(name, password, email);
             userService.addRolesUser(user, roles);
@@ -114,9 +116,9 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @GetMapping(value = "addUser")
     public String printAdd(ModelMap model) {
-        List<Role> roles = userService.getAllRoles();
+        List<String> roles = userService.getAllRoles();
         model.addAttribute("roles", roles);
-        return "admin/addUser";
+        return "addUser";
     }
 
     @GetMapping(value = "hello")

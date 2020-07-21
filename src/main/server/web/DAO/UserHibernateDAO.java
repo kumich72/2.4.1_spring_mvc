@@ -203,10 +203,10 @@ public class UserHibernateDAO implements IUserDAO {
         return false;
     }
 
-    public List<Role> getAllRoles() {
-        List<Role> users = new ArrayList<>();
+    public List<String> getAllRoles() {
+        List<String> users = new ArrayList<>();
         try {
-            users = roleRepository.findAll();
+            users = roleRepository.findRoles();
             return users;
         } catch (Exception e) {
             e.printStackTrace();
@@ -231,9 +231,9 @@ public class UserHibernateDAO implements IUserDAO {
         return null;
     }
 
-
     public boolean addRolesUser(User user, String[] roles) {
         try {
+            userRepository.save(user);
             for (String name : roles) {
                 Role role = new Role();
                 role.setName(name);
