@@ -12,7 +12,7 @@
 
     <properties>
         <spring.version>5.2.6.RELEASE</spring.version>
-        <spring-sec.version>5.3.3.RELEASE</spring-sec.version>
+        <spring-sec.version>5.3.9.RELEASE</spring-sec.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <mysql.mysql-connector-java.version>8.0.19</mysql.mysql-connector-java.version>
